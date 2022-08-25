@@ -1,7 +1,5 @@
-import 'package:faker/faker.dart';
 import 'package:flutter/material.dart';
 import 'package:usuarios/model/user.dart';
-import 'package:usuarios/objectbox.g.dart';
 
 import 'helper/object_box.dart';
 
@@ -41,6 +39,10 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late Stream<List<User>> streamUsers;
+  TextEditingController usuario = TextEditingController();
+  TextEditingController correo = TextEditingController();
+  String? tusuario;
+  String? tcorreo;
 
   @override
   void initState() {
@@ -78,12 +80,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     icon: const Icon(Icons.delete),
                     onPressed: () => objectBox.deleteUser(user.id),
                   ),
-                  onTap: () {
-                    user.name = Faker().person.firstName();
-                    user.email = Faker().internet.email();
-
-                    objectBox.insertUser(user);
-                  },
                 );
               },
             );
@@ -92,11 +88,51 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: (() {
-          final user = User(
-              name: Faker().person.firstName(),
-              email: Faker().internet.email());
-
-          objectBox.insertUser(user);
+          showModalBottomSheet(
+              //isDismissible: false,
+              isScrollControlled: true,
+              context: context,
+              builder: ((BuildContext context) {
+                return Container(
+                  padding: const EdgeInsets.all(25),
+                  height: 600,
+                  child: Column(
+                    //mainAxisAlignment: MainAxisAlignment.center,
+                    //mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      TextFormField(
+                        autofocus: true,
+                        controller: usuario,
+                        decoration: const InputDecoration(
+                          labelText: 'Nombre',
+                        ),
+                      ),
+                      TextFormField(
+                        autofocus: true,
+                        controller: correo,
+                        decoration: const InputDecoration(
+                          labelText: 'Correo',
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      ElevatedButton(
+                        child: const Text('Agregar'),
+                        onPressed: () {
+                          tusuario = usuario.text;
+                          tcorreo = correo.text;
+                          final user =
+                              User(name: '$tusuario', email: '$tcorreo');
+                          objectBox.insertUser(user);
+                          usuario.clear();
+                          correo.clear();
+                        },
+                      )
+                    ],
+                  ),
+                );
+              }));
         }),
         child: const Icon(Icons.add),
       ),

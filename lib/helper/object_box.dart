@@ -11,7 +11,6 @@ class ObjectBox {
 
   static Future<ObjectBox> init() async {
     final store = await openStore();
-
     return ObjectBox._init(store);
   }
 
